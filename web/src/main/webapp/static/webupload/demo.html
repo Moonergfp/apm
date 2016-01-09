@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="css/webuploader.css" type="text/css" rel="stylesheet"/>
+<script language="javascript" src="jquery-1.9.1.js"></script>
+<script language="javascript" src="webuploader.min.js"></script>
+<script language="javascript" src="jquery.uploader.js"></script>
+<!-- lms 
+<link rel="stylesheet" type="text/css" href="${ctxStatic}/defindUpload/css/webuploader.css"></link>
+<script src="${ctxStatic}/defindUpload/js/webuploader.js" type="text/javascript"></script>
+<script type="text/javascript" src="${ctxStatic}/webuploader/md5_md5blob.js"></script>//目前不支持
+<script src="${ctxStatic}/defindUpload/js/jquery.uploader.js" type="text/javascript"></script>
+-->
+
+
+<title>上传插件改版样式</title>
+</head>
+<body>
+   <div class="add_other"><img src="css/link.png"/><a id="picker">添加附件</a>&emsp;<a id="ctlBtn" class="start_file">开始上传</a></div>
+   <div class="filelist"></div>
+---------------LMS应用--------------------------------
+demo1:自定义显示按钮样式方式
+<div class="demo1">
+		 <div>
+		 	<a id="picker_demo1">选择上传文件</a>
+		 	<a id="file_btn_demo1" class="start_file">开始上传</a>
+		 </div>
+         <div class="file_list_demo1"></div>
+</div>
+demo2:使用插件初始化样式
+<div id="demo2"></div>
+
+demo3:webuploader处理值
+<div class="demo3"></div>
+
+demo4:使用弹出层
+<div class="demo4">
+	<button class="btn btn-primary myModal4">点击上传</button>
+</div>
+
+ demo5:大文件分片上传
+ <div id="demo5"></div>
+
+demo6:有备注
+可参考知识管理，上传文件
+
+<script type="text/javascript">
+	$(".demo1").webuploader({
+		initPicker: "picker_demo1", 
+        initList: "file_list_demo1",
+        initBtn: "file_btn_demo1",  
+        ctx:"${ctx}",//使用的是默认的路径
+        folderName:"task_manage_path",//指定上传的文件夹<系统配置键，文件夹名字>，为空默认主目录
+	 });
+
+	$("#demo2").webuploader({
+		initPicker: "picker_demo2",  
+        initList: "file_list_demo2",  
+        initBtn: "file_btn_demo2",  
+        ctx:"${ctx}",
+        ctxStatic:"${ctxStatic}",//上传图标路径
+        folderName:"power_source_file_path",
+        beUsed:true//使用插件初始化样式，默认为false
+	 });
+
+	/**
+	 * 由于uploader自己来管理存值，包括删除值后input框内的ID减少。如果调用者自己自定义处理值和删除的方法，需要实现以下的两个方法
+	 * 在uploadDoValue:false的情况下，必须都要调用 	getFileDetail toDeleteFile
+	 */
+	 function getFileDetail(fileId,fileName,file_id){
+			alert(fileId+" -- "+fileName+" -- "+file_id);
+		}
+	 
+	function toDeleteFile(fileId){
+		alert(fileId);			
+	}
+
+	 $(".demo3").webuploader({
+			initPicker: "picker_demo3", 
+			initList: "file_list_demo3",
+			initBtn: "file_btn_demo3",  
+			ctx:"${ctx}",//使用的是默认的路径
+			folderName:"task_manage_path",//指定上传的文件夹<系统配置键，文件夹名字>，为空默认主目录
+			uploadDoValue:true,
+			beUsed:true,
+	  });
+	
+	 $(".demo4").webuploader({
+			initPicker: "picker_demo2", 
+	        initList: "file_list_demo2",
+	        initBtn: "file_btn_demo2",  
+	        ctx:"${ctx}",//使用的是默认的路径
+	        folderName:"task_manage_path",//指定上传的文件夹<系统配置键，文件夹名字>，为空默认主目录
+	        beUsed:true,
+	        useModal:true,
+	        modalName:"myModal4",
+	        modalDesc:"导入文件不能超过5M，仅允许导入“xls”或“xlsx”格式文件!",
+	        
+	 }); 
+	
+
+	 $("#demo5").webuploader({
+			initPicker: "picker_demo5",  
+	        initList: "file_list_demo5",  
+	        initBtn: "file_btn_demo5",  
+	        ctx:"${ctx}",
+	        ctxStatic:"${ctxStatic}",//上传图标路径
+	        folderName:"power_source_file_path",
+	        beUsed:true,//使用插件初始化样式，默认为false
+	        chunked:true,//是否分片上传
+		    chunkSize:5242880,//分片尺寸默认5兆
+		    threads:3,//片的并发的数量
+	  });
+	 </script>
+
+</body>
+</html>

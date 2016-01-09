@@ -1,0 +1,177 @@
+/**上传弹出层样式*/
+	.init-modal{
+    	opacity: 0;
+    	top:0;
+    }
+    .xm-modal{
+    	z-index: -10;
+    }
+    .xm-btn{
+	 	margin: 0;
+        padding: 8px;
+        padding-left:20px;
+        padding-right: 20px;
+        line-height: 30px;
+        height: 30px;
+        font: bold 12px/28px "微软雅黑",Arial,"华文黑体","黑体",sans-serif;
+        color: #2e2e2e;
+        background: #e3edf9;
+        border-radius: 1px;
+        border: 1px solid #bdd5ee;
+        cursor: pointer;
+	 	margin-right: 12px;
+	 	outline: 0;
+	}
+
+	.xm-btn:hover{
+		background-color: #3bb4f2;
+	}
+
+	.xm-footer{
+		padding: 5px;
+	}
+
+	.xm-footer .xm-back{
+		background: #f4f4f4;
+		border: 1px solid #ccc;
+		float: right;
+		padding-top: 0px;
+		margin-top: -25px;
+	}
+
+	.xm-footer .xm-back:hover{
+		background: #ccc;
+	} 
+
+.webuploader-container {
+	position: relative;
+}
+.webuploader-element-invisible {
+	position: absolute !important;
+	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+    clip: rect(1px,1px,1px,1px);
+}
+.webuploader-pick {
+	position: relative;
+	display: inline;
+	cursor: pointer;
+}
+.webuploader-pick-hover {
+}
+
+.webuploader-pick-disable {
+	opacity: 0.6;
+	pointer-events:none;
+}
+
+
+
+/*新加部分*/
+.file{
+	margin-top: 3px;
+	/*background-color: #66CCFF;*/
+}
+
+.add_other a:hover{
+text-decoration:underline;
+color:#0066FF;
+cursor:pointer;
+}
+
+.start_file{
+	display: none;
+}
+
+.delete_file{
+margin-left:10px;}
+
+.filelist a{
+color:#0099FF;
+}
+
+.filelist a:hover{
+cursor:pointer;
+text-decoration:underline;
+color:#3333FF;}
+
+/*进度条*/
+.progress{
+width: 200px;  
+}
+
+.filelistn{
+    padding: 1%;
+    margin-top: 10px;
+    background-color: #f4f4f4;
+    border-radius: 6px;
+    position: relative;
+}
+
+.filelistn .progressbg{
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+}
+
+.filelistn .lmsprogress{
+    position: absolute;
+    top:40%;
+    width: 98%;
+}
+
+.filelistn .msgsucess{
+    color: #3bb4f2;
+    text-align: center;
+    position: absolute;
+    top: 20%;
+    width: 100%;
+    display: none;
+    font-weight: 600;
+}
+
+.filelistn .msgsucess .icon-ok-sign{
+    font-size: 30px;
+}
+
+.filelistn .msgerror{
+    color: #dd514c;
+    text-align: center;
+    position: absolute;
+    top: 20%;
+    width: 100%;
+    display: none;
+    font-weight: 600;
+}
+
+.filelistn .msgerror .icon-remove-sign{
+    font-size: 30px;
+}
+
+.filelistn .filename{
+    font-size: 16px;
+    font-weight: 600;
+    max-width: 300px;
+    overflow: hidden;
+    word-break:keep-all;           /* 不换行 */
+    white-space:nowrap;          /* 不换行 */
+    overflow:hidden;               /* 内容超出宽度时隐藏超出部分的内容 */
+    text-overflow:ellipsis;
+    padding-right:10px; 
+}
+
+.filenote_content{
+    min-height: 20px;
+    border-bottom: 1px solid #000;
+    border-radius: 2px;
+    outline: 0;
+    text-indent: 12px;
+    word-wrap: break-word;
+}
+
+.filenote_content:focus{
+    border-bottom: 1px solid #0e90d2;
+};

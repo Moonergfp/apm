@@ -1,0 +1,107 @@
+package apm.modules.message.web;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import apm.common.config.Global;
+import apm.common.core.Page;
+import apm.common.utils.StringUtils;
+import apm.common.web.BaseController;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import apm.modules.message.entity.PublishMessage;
+import apm.modules.message.service.PublishMessageService;
+import apm.modules.program.entity.PublishProgram;
+
+/**
+ * 发布 消息实体类Controller
+ * @author gfp
+ * @version 2015-09-08
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/publishMessage")
+public class PublishMessageController extends BaseController<PublishMessageService, PublishMessage> {
+
+	//注入其他的Service层或本层
+	@Autowired
+	private PublishMessageService publishMessageService;
+	
+	//返回到发布 消息实体类列表页，完成分页显示
+	@RequiresPermissions("publishMessage:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(PublishMessage publishMessage, HttpServletRequest request, HttpServletResponse response, Model model) {
+		List<PublishMessage> list = service.findAll();
+		model.addAttribute("list", list);
+		
+        Page<PublishMessage> page = service.find(new Page<PublishMessage>(request, response), publishMessage); 
+        model.addAttribute("page", page);
+		return "modules/message/publishMessageList";
+	}
+
+	//返回到发布 消息实体类表单页
+	@RequiresPermissions("publishMessage:view")
+	@RequestMapping(value = "form")
+	public String form(PublishMessage publishMessage, Model model) {
+		model.addAttribute("publishMessage", publishMessage);
+		return "modules/message/publishMessageForm";
+	}
+	
+	//保存发布 消息实体类信息，并返回到列表页
+	@RequiresPermissions("publishMessage:edit")
+	@RequestMapping(value = "save")
+	public String save(@Valid  PublishMessage publishMessage, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, publishMessage)){
+			return form(publishMessage, model);
+		}
+		service.save(publishMessage);
+		addMessage(redirectAttributes, "保存发布 消息实体类'" + publishMessage.getId() + "'成功");
+		return "redirect:"+Global.getAdminPath()+"/publishMessage/list";
+	}
+	
+	//根据ID删除发布 消息实体类信息，并返回到列表页
+	@RequiresPermissions("publishMessage:edit")
+	@RequestMapping(value = "delete")
+	public String delete(String id, RedirectAttributes redirectAttributes) {
+		service.delete(id);
+		addMessage(redirectAttributes, "删除发布 消息实体类成功");
+		return "redirect:"+Global.getAdminPath()+"/publishMessage/list";
+	}
+
+	//节目审核列表
+	@RequestMapping(value = "checklist")
+	public String checklist(PublishMessage publishMessage, HttpServletRequest request, HttpServletResponse response, Model model){
+	/*	List<PublishProgram> pubPros = service.findPubPros();*/
+		System.out.println(" 查询审核列表");
+		Page<PublishMessage> page  = service.findPubMsg(new Page<PublishMessage>(request, response),publishMessage); 
+	    model.addAttribute("page", page);
+	    model.addAttribute("pubPros",page.getList());
+	    if(StringUtils.isNotEmpty(publishMessage.getCheckStatus())){
+	    	 model.addAttribute("checkStatus",publishMessage.getCheckStatus());
+	    }
+		return "modules/message/checkMessage";
+	}
+	//节目审核列表
+	@ResponseBody
+	@RequestMapping(value = "checkPubMsg")
+	public String checkPubMsg(PublishMessage publishMessage,Model model) {
+		try{
+			service.checkPubMsg(publishMessage);
+			return "ok";
+		}catch(Exception e){
+			return "failed";
+		}
+	}
+}

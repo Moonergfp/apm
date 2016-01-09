@@ -1,0 +1,1324 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>节目制作</title>
+	<meta name="decorator" content="default"/>
+	<style type="text/css">
+		body{
+		margin: 0px;
+      }
+      
+ 	#feedback { font-size: 1.4em; }
+	#selectable .ui-selecting { background: #FECA40; }
+	#selectable .ui-selected { background: #F39814; color: white; }
+	#selectable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+	#selectable li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }
+	
+	</style>
+	<link href="${ctxStatic}/css/program/proMake.css" type="text/css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="${ctxStatic}/audioplayerengine/initaudioplayer-1.css">
+	 <link rel="stylesheet" href="${ctxStatic}/css/program/ruler.css" type="text/css" />
+	  <link rel="stylesheet" href="${ctxStatic}/css/program/colpick.css" type="text/css" />
+	<script src="${ctxStatic}/flowplayer_flash/flowplayer-3.2.13.min.js" type="text/javascript"></script>
+	<%-- <script src="${ctxStatic}/jPlayer/jquery.jplayer.min.js" type="text/javascript"></script> --%>
+</head>
+<body>
+<form action="${ctx}/program/save" method="post" target="_blank" id="saveForm">
+	<input type="text" name="saveDom" id="saveDom">
+</form>
+<form action="${ctx}/program/preview" method="post" target="_blank" id="previewForm">
+	<input type="text" name="dom" id="dom">
+</form>
+	 <form action="${ctx}/program/saveProgram" method="post">
+	    <input type="hidden" id="width" value="${width}">
+	    <input type="hidden" id="height" value="${height}">
+	    <input type="hidden" id="pUrl" value="${ctx}">
+	    <input type="range" min="0" max="800" value="0" disabled class="undoneid">
+	    <div class="create-top">
+		<div class="create-head">
+			<div class="head-back"><a type="button" class="btn btn-info">返回</a></div>
+			<div class="create-icon">
+				<ul class="head-ul">
+				<li for="backg_edit" id="for_backg_edit">
+					<span class="glyphicon glyphicon-th-large" title="背景"></span><span>背景</span>
+				</li>
+				<li for="text_edit" id="for_text_edit">
+					<span class="glyphicon glyphicon-text-size" title="文本"></span><span>文本</span>
+				</li>
+				<li for="img_edit" id="for_img_edit">
+					<span class="glyphicon glyphicon-picture" title="图片"></span><span>图片</span>
+				</li>
+				<li for="video_edit" id="for_video_edit">
+					<span class="glyphicon glyphicon-facetime-video" title="视频"></span><span>视频</span>
+				</li>
+				<li for="music_edit" id="for_music_edit">
+					<span class="glyphicon glyphicon-music" title="音乐"></span><span>音乐</span>
+				</li>
+				<li for="ppt_edit" id="for_ppt_edit">
+					<span class="glyphicon glyphicon-list-alt" title="ppt"></span><span>ppt</span>
+				</li>
+				<li for="word_edit" id="for_word_edit">
+					<span class="glyphicon glyphicon-list-alt" title="word"></span><span>word</span>
+				</li>
+				<li for="excel_edit" id="for_excel_edit">
+					<span class="glyphicon glyphicon-list-alt" title="excel"></span><span>excel</span>
+				</li>
+				<li for="weather_edit" id="for_weather_edit">
+					<span class="glyphicon glyphicon-cloud" title="天气"></span><span>天气</span>
+				</li>
+				<li for="date_edit" id="for_date_edit">
+					<span class="glyphicon glyphicon-dashboard" title="日期"></span><span>日期</span>
+				</li>
+				<!-- <li for="rss_edit" id="for_rss_edit">
+					<span class="glyphicon glyphicon-signal" title="RSS"></span><span>RSS</span>
+				</li> -->
+				</ul>
+			</div>
+			<div class="head-btn">
+				<a type="button" class="btn btn-success">保存</a>
+				<a type="button" class="btn btn-warning menu-save">另存为</a>
+				<a type="button" class="btn btn-danger">退出</a>
+			</div>
+		  </div>
+		 <div class="menubar">
+			<span class="menu-drawback glyphicon glyphicon-undo" id="undo" disabled title="撤销"></span>
+			<span class="menu-reset glyphicon glyphicon-share-alt" id="redo" disabled title="重做"></span>			 
+			<span class="menu-del glyphicon glyphicon-trash" title="删除"></span>
+			<span class="menu-anim">动作</span>
+			<span class="menu-popup glyphicon glyphicon-open" title="置顶"></span>
+			<span class="menu-popdown glyphicon glyphicon-save" title="置底"></span>
+			<span class="menu-upper glyphicon glyphicon-arrow-up" title="上一层"></span>
+			<span class="menu-downner glyphicon glyphicon-arrow-down" title="下一层"></span>
+			<span class="menu-left glyphicon glyphicon-align-left" title="左对齐"></span>
+			<span class="menu-center glyphicon glyphicon-align-center" title="中对齐"></span>
+			<span class="menu-right glyphicon glyphicon-align-right" title="右对齐"></span>
+			<span class="menu-top">上对齐</span>
+			<span class="menu-middle">中对齐</span>
+			<span class="menu-bottom">下对齐</span>
+			<span class="menu-topavg">竖中平均</span>
+			<span class="menu-leftavg">横中平均</span>
+			<span class="menu-lock glyphicon glyphicon-lock" title="锁定"></span>
+			<span class="menu-unlock glyphicon glyphicon-unlock" title="解锁"></span>
+			<span class="menu-preview glyphicon glyphicon-eye-open" title="预览"></span>			
+			<!-- <span class="menu-save">保存</span> -->
+		<!-- 	<span id="visRuler">显示/隐藏标尺</span> -->
+		</div>
+		</div>
+		<div class="create-main">
+		 <div class="create-content">
+		 	<div class="content-left">
+		 		<div class="backg_tpl">		 				
+	 				<div class="backg_tpl_item active" long="3600" id="tpl_item_1" to="topfd1" backsrc="" backname="" backcolor="">
+  						<div class="pull-left" > 
+	  						 <span class="tpl_item_index">1</span>
+	  						 <span class="time"></span> 
+	  						 <a href="javascript:void(0)" class="glyphicon glyphicon-trash scene-del"></a>
+  						 </div>
+  						 <img src="" alt="" class="tpl_item_thumbnail pull-right">
+  					</div>	 		
+		 		</div>
+		 		
+		 		<div class="backg_tpl_op">
+		 			<a href="javascript:void(0)" class="scene-copy">复制</a>
+			 		<a href="javascript:void(0)" class="scene-add">添加</a>
+			 	</div>
+		 	</div>	
+		 	 <div class="content-main">
+		 	  <div class="content-main-edit">
+		 	    <div id="topfd1" long=0 class="ui-widget-content content-center-topfd content-center" style="position: relative;background-color:#fff;background-repeat:no-repeat;background-size:100% 100%">
+		 		</div>
+		 	  </div>
+		 	  	
+		 	</div>	   
+			<div class="content-right">
+		 		<div class="op-label backg_edit">
+		 			<h2>背景编辑</h2>
+		 			<div class="op-label-item backg_img">
+		 				<span class="pull-left">图片背景</span>		 				
+		 				<button type="button" class="pull-right btn btn-primary btn-sm" data-toggle="modal" data-target="#backModal">添加图片</button>
+		 			</div>
+					<div class="backg_img_wrap">
+						<div class="backg_img_item active">
+			 				<img src="" alt="">	
+			 				<span>1</span>
+		 					<span class="backg_img_item_name ellipsis"></span>	
+		 					<a href="javascript:void(0)" class="glyphicon glyphicon-trash delBackImgBtn" title="删除图片"></a>
+			 			</div>			 			
+					</div>	 			
+
+		 			<div class="op-label-item backg_color"><span class="pull-left">单色背景</span><a class="pull-right btn btn-primary btn-sm addColor">添加颜色</a></div>
+
+		 			<div class="icon-item color_wrap">
+		 				<span style="background-color:#000000" class="bgcolor_item"></span>
+		 				<span style="background-color:#7e2412" class="bgcolor_item"></span>
+		 				<span style="background-color:#ff5400" class="bgcolor_item"></span>
+		 				<span style="background-color:#225801" class="bgcolor_item"></span>
+		 				<span style="background-color:#0c529e" class="bgcolor_item"></span>
+		 				<span style="background-color:#333333" class="bgcolor_item"></span>
+		 				<span style="background-color:#b61b52" class="bgcolor_item"></span>
+		 				<span style="background-color:#f4711f" class="bgcolor_item"></span>
+		 				<span style="background-color:#3bbc1e" class="bgcolor_item"></span>
+		 				<span style="background-color:#23a3d3" class="bgcolor_item"></span>
+		 				<span style="background-color:#888888" class="bgcolor_item"></span>
+		 				<span style="background-color:#d34141" class="bgcolor_item"></span>
+		 				<span style="background-color:#f7951e" class="bgcolor_item"></span>
+		 				<span style="background-color:#29b16a" class="bgcolor_item"></span>
+		 				<span style="background-color:#97daf3" class="bgcolor_item"></span>
+		 				<span style="background-color:#cccccc" class="bgcolor_item"></span>
+		 				<span style="background-color:#ec7c7c" class="bgcolor_item"></span>
+		 				<span style="background-color:#fdea02" class="bgcolor_item"></span>
+		 				<span style="background-color:#79c450" class="bgcolor_item"></span>
+		 				<span style="background-color:#563679" class="bgcolor_item"></span>
+		 				<span style="background-color:#ffffff" class="bgcolor_item"></span>
+		 				<span style="background-color:#ffcccc" class="bgcolor_item"></span>
+		 				<span style="background-color:#d9ef7f" class="bgcolor_item"></span>
+		 				<span style="background-color:#c3f649" class="bgcolor_item"></span>
+		 			</div>
+		 		</div>
+
+		 	
+		 		<div class="op-label text_edit">
+		 			<h2>文本编辑</h2>
+		 			<div class="op-label-item text_type">
+		 				<select name="" id="" class="txtanim">
+		 					<option value="none">静态文本</option>
+		 					<option value="left">向左滚动</option>
+		 					<option value="right">向右滚动</option>
+		 				</select>
+		 			</div>
+
+		 			<div class="op-label-item font-style"><span class="pull-left">文本样式</span><a href="javascript:void(0)" class="pull-right clearstyle">清除样式</a></div>
+
+		 			<div class="ovh op-label-item">
+		 				<select name="" id="" class="pull-left fontsize">
+		 					<option value="">T(字号)</option>
+		 					<option value="12px">12px</option>
+		 					<option value="13px">13px</option>
+		 					<option value="14px">14px</option>		 					
+		 					<option value="16px">16px</option>		 					
+		 					<option value="18px">18px</option>		 					
+		 					<option value="20px">20px</option>
+		 					<option value="24px">24px</option>		 					
+		 					<option value="32px">32px</option>		 					
+		 					<option value="48px">48px</option>	
+		 					<option value="64px">64px</option>		 					
+		 					<option value="96px">96px</option>	
+		 				</select>
+		 				<select name="" id="" class="pull-right txtcolor">
+		 					<option value="">字体颜色</option>		 					
+                            <option style="background-color:#000000; color:#FFFFFF;" value="rgb(0, 0, 0)">黑</option>
+                            <option style="background-color:#FFFFFF" value="rgb(255, 255, 255)">白</option>
+                            <option style="background-color:#C6C6C6" value="rgb(198, 198, 198)">灰</option>
+                            <option style="background-color:#C00000" value="rgb(192, 0, 0)">深红</option>
+                            <option style="background-color:#FF0000" value="rgb(255, 0, 0)">红</option>
+                            <option style="background-color:#FFC000" value="rgb(255, 192, 0)">橙</option>
+                            <option style="background-color:#FFFF00" value="rgb(255, 255, 0)">黄</option>
+                            <option style="background-color:#00B050" value="rgb(0, 176, 80)">绿</option>
+                            <option style="background-color:#00B0F0" value="rgb(0, 176, 240)">浅蓝</option>
+                            <option style="background-color:#0070C0" value="rgb(0, 112, 192)">蓝</option>
+                            <option style="background-color:#002060; color:#FFFFFF;" value="rgb(0, 32, 96)">深蓝</option>
+                        
+		 				</select> 
+		 			<!-- 	<div class="pull-right txtcolor"></div> -->
+		 			</div>
+		 			<div class="icon-item text-align">
+		 				<span class="glyphicon glyphicon-align glyphicon-align-left" title="左对齐" type="left"></span>
+		 				<span class="glyphicon glyphicon-align glyphicon-align-center" title="居中" type="center"></span>
+		 				<span class="glyphicon glyphicon-align glyphicon-align-right" title="右对齐" type="right"></span>
+		 				<span class="glyphicon glyphicon-align glyphicon-align-justify" title="左右对齐" type="justify"></span>
+		 				<span class="glyphicon glyphicon-bold" title="粗体" type="bold"></span>
+		 				<span class="glyphicon glyphicon-italic" title="倾斜" type="italic"></span>
+		 				<span class="glyphicon glyphicon-underline glyphicon-text-width" title="下划线" type="underline"></span>
+		 			</div>
+		 		</div>
+		 		<div class="op-label img_edit">
+		 			<h2>图片编辑</h2>
+		 			<div class="op-label-item">
+		 				<select name="" id="" class="pull-left imgdelay">
+		 					<option value="">切换时间</option>
+		 					<option value="3">3s</option>
+		 					<option value="4">4s</option>
+		 					<option value="5">5s</option>
+		 					<option value="10">10s</option>
+		 					<option value="15">15s</option>
+		 					<option value="20">20s</option>
+		 					<option value="30">30s</option>
+		 					<option value="45">45s</option>
+		 					<option value="60">60s</option>		 					
+		 				</select>		 				
+		 				<button type="button" class="pull-right btn btn-primary btn-sm" data-toggle="modal" data-target="#imgModal">添加图片</button>
+		 			</div>
+					<div class="img_wrap">
+						
+					</div>	 
+
+		 		</div>
+		 		<div class="op-label video_edit">
+		 			<h2>视频编辑</h2>
+		 			<div class="op-label-item">		 				
+		 				<button type="button" class="pull-right btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#videoModal">添加视频</button>
+		 			</div>
+					<div class="video_wrap">
+						
+					</div>	 
+
+		 		</div>
+		 		<div class="op-label music_edit">
+		 			<h2>音乐编辑</h2>
+		 			<div class="op-label-item">	
+		 				<button type="button" class="pull-right btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#musicModal">添加音乐</button>
+		 			</div>
+					<div class="music_wrap">
+					<%-- 	<div class="music_item">
+			 				<img src="${ctxStatic}/images/program/testimg1.png"alt="">	
+			 				<span>1</span>
+			 				<span class="long music_item_time">02:45</span>
+		 					<span class="music_item_name">音乐的名字</span>	
+			 			</div> --%>
+			 			
+					</div>	 
+		 		</div>
+		 		<div class="op-label ppt_edit">
+		 			<h2>PPT编辑</h2>
+		 			<div class="op-label-item">		 				
+		 				<select name="" id="" class="pull-left pptdelay">
+		 					<option value="">切换时间</option>
+		 					<option value="3">3s</option>
+		 					<option value="4">4s</option>
+		 					<option value="5">5s</option>
+		 					<option value="10">10s</option>
+		 					<option value="15">15s</option>
+		 					<option value="20">20s</option>
+		 					<option value="30">30s</option>
+		 					<option value="45">45s</option>
+		 					<option value="60">60s</option>	
+		 				</select>
+		 				<button type="button" class="pull-right btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#pptModal">添加ppt</button>
+		 			</div>
+					<div class="ppt_wrap">						
+					</div>	 
+		 		</div>
+		 		<div class="op-label word_edit">
+		 			<h2>文档编辑</h2>
+		 			<div class="op-label-item">	
+		 				<button type="button" class="pull-right btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#wordModal">添加word</button>
+		 			</div>
+					<div class="word_wrap">						
+					</div>
+					<div class="op-label-item">	
+		 				<span class="pull-left">滚动速度</span>
+		 			</div>	
+		 			<div class="icon-item speed_wrap">
+		 				<button type="button" class="btn btn-primary btn-sm" delay="5000">极慢</button>
+		 				<button type="button" class="btn btn-primary btn-sm" delay="3000">较慢</button>
+		 				<button type="button" class="btn btn-primary btn-sm" delay="2000">一般</button>
+		 				<button type="button" class="btn btn-primary btn-sm" delay="1000">较快</button>
+		 			</div>
+		 		</div>
+		 		<div class="op-label excel_edit">
+		 			<h2>文档编辑</h2>
+		 			<div class="op-label-item">	
+		 				<button type="button" class="pull-right btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#excelModal">添加Excel</button>
+		 			</div>
+					<div class="excel_wrap">
+					<%-- 	<div class="excelitem">
+			 				<img src="${ctxStatic}/images/program/testimg1.png"alt="">	
+			 				<span>21页</span>			 				
+		 					<span class="excel_item_name">excel的名字</span>	
+			 			</div> --%>
+			 			
+			 		
+					</div>
+					<div class="op-label-item">	
+		 				<span class="pull-left">滚动速度</span>
+		 			</div>	
+		 			<div class="icon-item speed_wrap">
+		 				<button type="button" class="btn btn-primary btn-sm" delay="5000">极慢</button>
+		 				<button type="button" class="btn btn-primary btn-sm" delay="3000">较慢</button>
+		 				<button type="button" class="btn btn-primary btn-sm" delay="2000">一般</button>
+		 				<button type="button" class="btn btn-primary btn-sm" delay="1000">较快</button>
+		 			</div>
+		 		</div>
+		 		<div class="op-label weather_edit">
+		 			<h2>天气编辑</h2>
+		 			<div class="op-label-item">	
+		 				<span class="pull-left lineheight">选择样式</span>
+		 				<select onchange="TQCODER.changeIcon($(this))" id="selStyle">
+                   			<option value="1" img="/static/img/b1.gif">经典</option>
+							<option value="2" img="/static/img/b2.gif">样式2</option>
+							<option value="3" img="/static/img/b3.gif">样式3</option>
+							<option value="4" img="/static/img/b4.gif">样式4</option>
+							<option value="5" img="/static/img/b5.gif">样式5</option>
+                        </select>
+                        
+		 			</div>
+		 			<div class="op-label-item">	
+		 				<span class="pull-left lineheight">选择城市</span>
+		 				<!-- <div class="pull-right" id="provinceCity">
+		 				</div> -->
+		 					<!-- <select name="" id="" class="pull-right">
+		 					<option value="">（省份）</option>
+		 					<option value="">北京</option>
+		 					<option value="">上海</option>
+		 					<option value="">广州</option>
+		 				</select>
+		 				<select name="" id="" class="pull-right">
+		 					<option value="">（城市）</option>
+		 					<option value="">深圳</option>
+		 					<option value="">安徽</option>
+		 					<option value="">广州</option>
+		 				</select> -->
+		 				
+		 				
+                          <select onchange="TQCODER.changeProvince($(this))" id="selProvince" name="" class="pull-left">
+                           	<option value="">选择城市</option>
+							<option value="01">北京</option>
+							<option value="02">上海</option>
+							<option value="03">天津</option>
+							<option value="04">重庆</option>
+							<option value="06">吉林</option>
+							<option value="07">辽宁</option>
+							<option value="09">河北</option>
+							<option value="10">山西</option>
+							<option value="11">陕西</option>
+							<option value="12">山东</option>
+							<option value="13">新疆</option>
+							<option value="14">西藏</option>
+							<option value="15">青海</option>
+							<option value="16">甘肃</option>
+							<option value="17">宁夏</option>
+							<option value="18">河南</option>
+							<option value="05">黑龙江</option>
+							<option value="19">江苏</option>
+							<option value="20">湖北</option>
+							<option value="21">浙江</option>
+							<option value="22">安徽</option>
+							<option value="23">福建</option>
+							<option value="24">江西</option>
+							<option value="25">湖南</option>
+							<option value="26">贵州</option>
+							<option value="27">四川</option>
+							<option value="28">广东</option>
+							<option value="29">云南</option>
+							<option value="30">广西</option>
+							<option value="31">海南</option>
+							<option value="32">香港</option>
+							<option value="33">澳门</option>
+							<option value="34">台湾</option>
+							<option value="08">内蒙古</option>								
+							<option value="1" py="asia">亚洲</option>
+							<option value="2" py="europe">欧洲</option>
+							<option value="3" py="america">美洲</option>
+							<option value="4" py="oceania">大洋洲</option>
+							<option value="5" py="africa">非洲</option>
+						</select>
+                        <select onchange="TQCODER.changeCity($(this))" id="selCity" style="display: none;"></select>
+                        <select onchange="TQCODER.changeCounty($(this))" id="selCounty" style="display: none;"></select> 
+                        <!-- <br><span class="tip"> 不选则时系统自动判断访问者IP所在地并显示该地区天气。</span>    -->                     
+		 			</div>
+		 			<div class="op-label-item">	
+		 				<span class="pull-left lineheight">文本颜色</span>
+		 				<!-- <select name="" id="" class="pull-right">
+		 					<option value="">（颜色）</option>
+		 					<option value="">A</option>
+		 					<option value="">B</option>
+		 					<option value="">C</option>
+		 				</select>	 -->	 	
+		 				<select onchange="TQCODER.changeColor($(this))" id="selColor" class="pull-left">
+                             <option selected="selected" style="background-color:#000000; color:#FFFFFF;" value="">黑</option>
+                             <option style="background-color:#FFFFFF" value="FFFFFF">白</option>
+                             <option style="background-color:#C6C6C6" value="C6C6C6">灰</option>
+                             <option style="background-color:#C00000" value="C00000">深红</option>
+                             <option style="background-color:#FF0000" value="FF0000">红</option>
+                             <option style="background-color:#FFC000" value="FFC000">橙</option>
+                             <option style="background-color:#FFFF00" value="FFFF00">黄</option>
+                             <option style="background-color:#00B050" value="00B050">绿</option>
+                             <option style="background-color:#00B0F0" value="00B0F0">浅蓝</option>
+                             <option style="background-color:#0070C0" value="0070C0">蓝</option>
+                             <option style="background-color:#002060; color:#FFFFFF;" value="002060">深蓝</option>
+                         </select>			
+		 			</div>
+		 			<div class="op-label-item">	
+		 				<span class="pull-left lineheight">背景颜色</span>
+		 				<!-- <select name="" id="" class="pull-right">
+		 					<option value="">（颜色）</option>
+		 					<option value="">A</option>
+		 					<option value="">B</option>
+		 					<option value="">C</option>
+		 				</select>	 -->	 
+		 				<select onchange="TQCODER.changeBgColor($(this))" id="selBgColor" class="pull-left">
+                             <option selected="selected" style="background-color:#FFFFFF;" value="">透明</option>
+                             <option style="background-color:#000000; color:#FFFFFF;" value="000000">黑</option>
+                             <option style="background-color:#FFFFFF" value="FFFFFF">白</option>
+                             <option style="background-color:#C6C6C6" value="C6C6C6">灰</option>
+                             <option style="background-color:#C00000" value="C00000">深红</option>
+                             <option style="background-color:#FF0000" value="FF0000">红</option>
+                             <option style="background-color:#FFC000" value="FFC000">橙</option>
+                             <option style="background-color:#FFFF00" value="FFFF00">黄</option>
+                             <option style="background-color:#00B050" value="00B050">绿</option>
+                             <option style="background-color:#00B0F0" value="00B0F0">浅蓝</option>
+                             <option style="background-color:#0070C0" value="0070C0">蓝</option>
+                             <option style="background-color:#002060; color:#FFFFFF;" value="002060">深蓝</option>
+                         </select>				
+		 			</div>
+		 			<select onchange="TQCODER.changeTemplate($(this))" id="select_id" hidden>
+             			<option value="12" wind="" temp="" width="100%" height="60" num="5">Hao123版</option>
+						<option value="2" wind="" temp="" width="700" height="70" num="3">2345版</option>
+						<option value="1" wind="1" temp="" width="450" height="18" num="2">横线</option>
+						<option value="4" wind="1" temp="" width="130" height="120" num="6">竖条</option>
+						<option value="8" wind="" temp="" width="225" height="80" num="3">列表文字</option>
+						<option value="10" wind="" temp="" width="300" height="25" num="">竖条滚动</option>
+						<option value="11" wind="" temp="" width="500" height="15" num="">横条滚动</option>
+						<option value="19" wind="" temp="1" width="800" height="120" num="5">温度计版</option>
+                    </select>
+                   
+		 			<select onchange="TQCODER.changeNum($(this))" id="select_num" hidden><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+		 			<span onclick="return TQCODER.preview()" class="btn01 btn btn-primary hide">预览</span>
+		            <textarea rows="4" cols="90" id="field_code" hidden></textarea>	
+		 		
+		 		</div>
+		 		<div class="op-label date_edit">
+		 			<h2>日期编辑</h2>
+		 			<!-- <div class="op-label-item">	
+		 				<select name="" class="dateStyle" >
+		 					<option value="1">样式1</option>
+		 					<option value="2">样式2</option>
+		 				</select>
+		 			</div> -->
+		 			<div class="op-label-item">	
+		 				<span class="pull-left lineheight">选择时区</span>
+		 				<select name="" class="pull-right getTime" onchange="getTime(this);">
+		 					<option value="8">北京</option>
+		 					<option value="-5">纽约</option>
+		 					<option value="9">东京</option>
+		 					<option value="0">伦敦</option>
+		 					<option value="1">巴黎</option>
+		 				</select>		 				
+		 			</div>
+		 			<div class="ovh op-label-item">	
+		 				<select name="" id="" class="pull-left fontsize">
+		 					<option value="">T(字号)</option>
+		 					<option value="10px">10px</option>
+		 					<option value="11px">11px</option>
+		 					<option value="12px">12px</option>
+		 					<option value="13px">13px</option>
+		 					<option value="14px">14px</option>
+		 					<option value="15px">15px</option>
+		 					<option value="16px">16px</option>
+		 					<option value="17px">17px</option>
+		 					<option value="18px">18px</option>
+		 					<option value="19px">19px</option>
+		 					<option value="20px">20px</option>
+		 				</select>
+		 				<select name="" id="" class="pull-right txtcolor">
+		 					<option value="">字体颜色</option>
+		 					<option style="background-color:#FFFFFF" value="rgb(255, 255, 255)">白</option>
+		 					<option style="background-color:#000000; color:#FFFFFF;" value="rgb(0, 0, 0)">黑</option>                         
+                            <option style="background-color:#C6C6C6" value="rgb(198, 198, 198)">灰</option>
+                            <option style="background-color:#C00000" value="rgb(192, 0, 0)">深红</option>
+                            <option style="background-color:#FF0000" value="rgb(255, 0, 0)">红</option>
+                            <option style="background-color:#FFC000" value="rgb(255, 192, 0)">橙</option>
+                            <option style="background-color:#FFFF00" value="rgb(255, 255, 0)">黄</option>
+                            <option style="background-color:#00B050" value="rgb(0, 176, 80)">绿</option>
+                            <option style="background-color:#00B0F0" value="rgb(0, 176, 240)">浅蓝</option>
+                            <option style="background-color:#0070C0" value="rgb(0, 112, 192)">蓝</option>
+                            <option style="background-color:#002060; color:#FFFFFF;" value="rgb(0, 32, 96)">深蓝</option>
+		 				</select> 
+		 				 				
+		 			</div>
+		 			<div class="icon-item text-align text_wrap">
+		 				<span class="glyphicon glyphicon-bold" title="粗体" type="bold"></span>
+		 				<span class="glyphicon glyphicon-italic" title="倾斜" type="italic"></span>
+		 				<span class="glyphicon glyphicon-underline glyphicon-text-width" title="下划线" type="underline"></span>
+		 			</div>
+		 		</div>
+				<div class="op-label rss_edit">
+		 			<h2>RSS编辑</h2>
+		 			<div class="op-label-item">
+		 				<span class="pull-left">RSS源选择</span>	
+		 				<a href="javascript:void(0)">添加RSS</a>
+		 			</div>
+		 			<div class="op-label-item">
+		 				<span class='pull-left'>滚动条数</span>
+		 				<select name="" id="" class="t">
+		 					<option value="">6</option>
+		 					<option value="">7</option>
+		 					<option value="">8</option>
+		 					<option value="">9</option>
+		 				</select>		 				
+		 			</div>
+		 			<div class="op-label-item">
+		 				<span class='pull-left'>滚动内容</span>
+		 				<select name="" id="" class="pull-right">
+		 					<option value="">网站A</option>
+		 					<option value="">网站B</option>
+		 					<option value="">网站C</option>
+		 					<option value="">网站D</option>
+		 				</select>		 				
+		 			</div>
+		 			<div class="op-label-item">			 				
+		 				<select name="" id="" class="pull-left">
+		 					<option value="">T(字号)</option>
+		 					<option value="">96px</option>
+		 					<option value="">72px</option>
+		 					<option value="">64px</option>
+		 				</select>	
+		 				<select name="" id="" class="pull-right">
+		 					<option value="">(字号颜色)</option>
+		 					<option value="">A</option>
+		 					<option value="">B</option>
+		 					<option value="">C</option>
+		 				</select>			 				
+		 			</div>		 			
+		 			<div class="op-label-item">
+		 				<span class='pull-left'>滚动方式</span>
+		 				<select name="" id="" class="pull-right">
+		 					<option value="">向下</option>
+		 					<option value="">向上</option>
+		 					<option value="">向左</option>
+		 					<option value="">向右</option>
+		 				</select>		 				
+		 			</div>
+		 			<div class="icon-item speed_wrap">
+		 				<span>级慢</span>
+		 				<span>较慢</span>
+		 				<span>一般</span>		 					 			
+		 				<span>较快</span>	
+		 			</div>
+		 		</div>
+		 	</div>
+		 </div>
+		</div>
+	</form>
+
+<!-- 弹出素材模态编辑框 -->
+<!-- Modal -->
+<div class="modal fade bs-example-modal-lg material-modal" id="backModal" tabindex="-1" role="dialog" aria-labelledby="backModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">背景素材</h4>
+      </div>
+      <div class="modal-body ovh">
+       		<div class="material-left pull-left">
+       			<div class="database active material-type"><a href="javascript:void(0)">背景库</a></div>
+       			<div class="mymaterial myback material-type"><a href="javascript:void(0)">我的背景</a></div>
+       			<div class="upload_material"><a href="javascript:void(0)" id="backUpload" class="glyphicon glyphicon-cloud-upload">上传</a></div>
+       		</div>	
+       		<div class="material-right pull-right">
+       			<div class="material-header ovh">
+       				<a href="javascript:void(0)">最新</a>
+       				<a href="javascript:void(0)">最热</a>
+       				<select name="" id="" class="form-control">
+       					<option value="">广告商A</option>
+       					<option value="">广告商B</option>
+       					<option value="">广告商C</option>
+       					<option value="">广告商D</option>
+       				</select>
+       				<form class="form-inline pull-right ">
+					  <div class="form-group">
+					    <label class="sr-only" for="exampleInputAmount">搜索</label>
+					    <div class="input-group">					  
+					      <input type="text" class="form-control input-sm" id="exampleInputAmount" placeholder="Amount">
+					      <!-- <div class="input-group-addon glyphicon glyphicon-search"></div> -->
+					    </div>
+					  </div>
+					  <button type="submit" class="btn btn-primary btn-sm">搜索</button>
+					</form>
+       			</div>
+       			<div class="material-mainer">
+       				<div class="row">
+					    <c:forEach items="${bList}" var="f">
+			       			<div class="material-item col-sm-6 col-md-4 backmodal-m-i">
+							    <div class="thumbnail">
+							      <img src="${f.path}" alt="${f.name}">
+							      <div class="caption ">
+							        <h3 class="ellipsis" data-toggle="tooltip" data-placement="right" title="${f.name}">${f.name}</h3>					        
+							      </div>
+							    </div>
+							  </div>
+       			         </c:forEach>  
+					</div>
+       			</div>
+       			<div class="ovh material-footer">
+       				<nav class="pull-left">
+					  <ul class="pagination pagination-sm">
+					    <li>
+					      <a href="#" aria-label="Previous">
+					        <span aria-hidden="true">&laquo;</span>
+					      </a>
+					    </li>
+					    <li class="active"><a href="#">1</a></li>
+					    <li><a href="#">2</a></li>
+					    <li><a href="#">3</a></li>
+					    <li><a href="#">4</a></li>
+					    <li><a href="#">5</a></li>
+					    <li>
+					      <a href="#" aria-label="Next">
+					        <span aria-hidden="true">&raquo;</span>
+					      </a>
+					    </li>
+					  </ul>
+					</nav>
+					<div class="pull-right">
+						<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">取消</button>
+        				<button type="button" class="btn btn-primary btn-sm">确定</button>
+					</div>
+       			</div>
+
+       		</div>
+      </div>    
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg material-modal" id="imgModal" tabindex="-1" role="dialog" aria-labelledby="imgModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">图片素材</h4>
+      </div>
+      <div class="modal-body ovh">
+       		<div class="material-left pull-left">
+       			<div class="database active material-type"><a href="javascript:void(0)">图片库</a></div>
+       			<div class="mymaterial myback material-type"><a href="javascript:void(0)">我的图片</a></div>
+       			<div class="upload_material"><a href="javascript:void(0)" id="imgUpload" class="glyphicon glyphicon-cloud-upload">上传</a></div>
+       		</div>	
+       		<div class="material-right pull-right">
+       			<div class="material-header ovh">
+       				<a href="javascript:void(0)">最新</a>
+       				<a href="javascript:void(0)">最热</a>
+       				<select name="" id="" class="form-control">
+       					<option value="">广告商A</option>
+       					<option value="">广告商B</option>
+       					<option value="">广告商C</option>
+       					<option value="">广告商D</option>
+       				</select>
+       				<form class="form-inline pull-right ">
+					  <div class="form-group">
+					    <label class="sr-only" for="exampleInputAmount">搜索</label>
+					    <div class="input-group">					  
+					      <input type="text" class="form-control input-sm" id="exampleInputAmount" placeholder="Amount">
+					      <!-- <div class="input-group-addon glyphicon glyphicon-search"></div> -->
+					    </div>
+					  </div>
+					  <button type="submit" class="btn btn-primary btn-sm">搜索</button>
+					</form>
+       			</div>
+       			<div class="material-mainer">
+       				<div class="row">
+					      <c:forEach items="${iList}" var="f">
+			       			<div class="material-item col-sm-6 col-md-4 imgmodal-m-i">
+							    <div class="thumbnail">
+							      <img src="${f.path}" alt="${f.name}">
+							      <div class="caption">
+							         <h3 class="ellipsis">${f.name}</h3>					        
+							      </div>
+							    </div>
+							  </div>
+       			         </c:forEach>  
+					</div>
+       			</div>
+       			<div class="ovh material-footer">
+       				<nav class="pull-left">
+					  <ul class="pagination pagination-sm">
+					    <li>
+					      <a href="#" aria-label="Previous">
+					        <span aria-hidden="true">&laquo;</span>
+					      </a>
+					    </li>
+					    
+					    <li class="active"><a href="#">1</a></li>
+					    <li><a href="#">2</a></li>
+					    <li><a href="#">3</a></li>
+					    <li><a href="#">4</a></li>
+					    <li><a href="#">5</a></li>
+					    <li>
+					      <a href="#" aria-label="Next">
+					        <span aria-hidden="true">&raquo;</span>
+					      </a>
+					    </li>
+					  </ul>
+					</nav>
+					<div class="pull-right">
+						<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">取消</button>
+        				<button type="button" class="btn btn-primary btn-sm confirm">确定</button>
+					</div>
+       			</div>
+
+       		</div>
+      </div>    
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade bs-example-modal-lg material-modal" id="pptModal" tabindex="-1" role="dialog" aria-labelledby="pptModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">ppt素材</h4>
+      </div>
+      <div class="modal-body ovh">
+       		<div class="material-left pull-left">
+       			<div class="database active material-type"><a href="javascript:void(0)">ppt库</a></div>
+       			<div class="mymaterial myback material-type"><a href="javascript:void(0)">我的ppt</a></div>
+       			<div class="upload_material"><a href="javascript:void(0)" id="pptUpload" class="glyphicon glyphicon-cloud-upload">上传</a></div>
+       		</div>	
+       		<div class="material-right pull-right">
+       			<div class="material-header ovh">
+       				<a href="javascript:void(0)">最新</a>
+       				<a href="javascript:void(0)">最热</a>
+       				<select name="" id="" class="form-control">
+       					<option value="">广告商A</option>
+       					<option value="">广告商B</option>
+       					<option value="">广告商C</option>
+       					<option value="">广告商D</option>
+       				</select>
+       				<form class="form-inline pull-right ">
+					  <div class="form-group">
+					    <label class="sr-only" for="exampleInputAmount">搜索</label>
+					    <div class="input-group">					  
+					      <input type="text" class="form-control input-sm" placeholder="Amount">					    
+					    </div>
+					  </div>
+					  <button type="submit" class="btn btn-primary btn-sm">搜索</button>
+					</form>
+       			</div>
+       			<div class="material-mainer">
+		               <div class="material-item top-span row">
+							  <span class="col-md-5">文件名</span>
+							  <span class="col-md-2">页数</span>
+							  <span class="col-md-2" aria-labelledby=>大小</span>
+							  <span class="col-md-3">修改时间</span>	 	
+		       			</div>  
+		       			<c:forEach items="${pList}" var="f" >
+		       				<div class="material-item row pptmodal-m-i">
+		       					<span class="col-md-5 ellipsis"><img src="${f.pptImgPath[0]}" alt="${f.name}" imgList="${f.pptImgPath}" note="${f.note}">${f.name}</span>
+		       					<span class="col-md-2">${f.note}</span>
+		       					<span class="col-md-2">${f.size}</span>
+		       					<span class="col-md-3"><fmt:formatDate value="${f.createDate}"  pattern="yyyy-MM-dd"/></span>
+		       				</div>
+		       			</c:forEach>
+       			</div>
+       			<div class="ovh material-footer">
+       				<nav class="pull-left">
+					  <ul class="pagination pagination-sm">
+					    <li>
+					      <a href="#" aria-label="Previous">
+					        <span aria-hidden="true">&laquo;</span>
+					      </a>
+					    </li>
+					    <li class="active"><a href="#">1</a></li>
+					    <li><a href="#">2</a></li>
+					    <li><a href="#">3</a></li>
+					    <li><a href="#">4</a></li>
+					    <li><a href="#">5</a></li>
+					    <li>
+					      <a href="#" aria-label="Next">
+					        <span aria-hidden="true">&raquo;</span>
+					      </a>
+					    </li>
+					  </ul>
+					</nav>
+					<div class="pull-right">
+						<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">取消</button>
+        				<button type="button" class="btn btn-primary btn-sm confirm">确定</button>
+					</div>
+       			</div>
+
+       		</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade bs-example-modal-lg material-modal" id="wordModal" tabindex="-1" role="dialog" aria-labelledby="wordModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">word素材</h4>
+      </div>
+      <div class="modal-body ovh">
+       		<div class="material-left pull-left">
+       			<div class="database active material-type"><a href="javascript:void(0)">word库</a></div>
+       			<div class="mymaterial myback material-type"><a href="javascript:void(0)">我的word</a></div>
+       			<div class="upload_material"><a href="javascript:void(0)" id="wordUpload" class="glyphicon glyphicon-cloud-upload">上传</a></div>
+       		</div>	
+       		<div class="material-right pull-right">
+       			<div class="material-header ovh">
+       				<a href="javascript:void(0)">最新</a>
+       				<a href="javascript:void(0)">最热</a>
+       				<select name="" id="" class="form-control">
+       					<option value="">广告商A</option>
+       					<option value="">广告商B</option>
+       					<option value="">广告商C</option>
+       					<option value="">广告商D</option>
+       				</select>
+       				<form class="form-inline pull-right ">
+					  <div class="form-group">
+					    <label class="sr-only" for="exampleInputAmount">搜索</label>
+					    <div class="input-group">					  
+					      <input type="text" class="form-control input-sm" placeholder="Amount">		    
+					    </div>
+					  </div>
+					  <button type="submit" class="btn btn-primary btn-sm">搜索</button>
+					</form>
+       			</div>
+       			<div class="material-mainer">
+		               <div class="top-span row">
+							  <span class="col-md-5">文件名</span>
+							  <span class="col-md-2">页数</span>
+							  <span class="col-md-2" aria-labelledby=>大小</span>
+							  <span class="col-md-3">修改时间</span>	 	
+		       			</div>  
+		       			<c:forEach items="${wList}" var="f">
+		       				<div class="material-item row wordmodal-m-i">
+		       					<span class="col-md-5 ellipsis"><img src="${ctxStatic}/images/program/www.png" alt="${f.name}" note="${f.note}" wordurl="${f.path}" htmlurl="" attrid="${f.id}">${f.name}</span>
+		       					<span class="col-md-2">${f.note}</span>
+		       					<span class="col-md-2">${f.size}</span>
+		       					<span class="col-md-3"><fmt:formatDate value="${f.createDate}"  pattern="yyyy-MM-dd"/></span>
+		       				</div>
+		       			</c:forEach>
+       			</div>
+       			<div class="ovh material-footer">
+       				<nav class="pull-left">
+					  <ul class="pagination pagination-sm">
+					    <li>
+					      <a href="#" aria-label="Previous">
+					        <span aria-hidden="true">&laquo;</span>
+					      </a>
+					    </li>
+					    <li class="active"><a href="#">1</a></li>
+					    <li><a href="#">2</a></li>
+					    <li><a href="#">3</a></li>
+					    <li><a href="#">4</a></li>
+					    <li><a href="#">5</a></li>
+					    <li>
+					      <a href="#" aria-label="Next">
+					        <span aria-hidden="true">&raquo;</span>
+					      </a>
+					    </li>
+					  </ul>
+					</nav>
+					<div class="pull-right">
+						<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">取消</button>
+        				<button type="button" class="btn btn-primary btn-sm confirm">确定</button>
+					</div>
+       			</div>
+       		</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade bs-example-modal-lg material-modal" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">视频素材</h4>
+      </div>
+      <div class="modal-body ovh">
+       		<div class="material-left pull-left">
+       			<div class="database active material-type"><a href="javascript:void(0)">视频库</a></div>
+       			<div class="mymaterial myback material-type"><a href="javascript:void(0)">我的视频</a></div>
+       			<div class="upload_material"><a href="javascript:void(0)" id="videoUpload" class="glyphicon glyphicon-cloud-upload">上传</a></div>
+       		</div>	
+       		<div class="material-right pull-right">
+       			<div class="material-header ovh">
+       				<a href="javascript:void(0)">最新</a>
+       				<a href="javascript:void(0)">最热</a>
+       				<select name="" id="" class="form-control">
+       					<option value="">全部</option>
+       					<option value="">广告商A</option>
+       					<option value="">广告商B</option>
+       					<option value="">广告商C</option>
+       					<option value="">广告商D</option>
+       				</select>
+       				<form class="form-inline pull-right ">
+					  <div class="form-group">
+					    <label class="sr-only" for="exampleInputAmount">搜索</label>
+					    <div class="input-group">					  
+					      <input type="text" class="form-control input-sm" placeholder="Amount">					    
+					    </div>
+					  </div>
+					  <button type="submit" class="btn btn-primary btn-sm">搜索</button>
+					</form>
+       			</div>
+       			<div class="material-mainer"> 
+       			 <c:forEach items="${vList}" var="f">
+	       			 <div class="ovh material-item videomodal-m-i">
+	       			 	<!-- 初始化时长是long=5s -->
+	       				<img src="${f.imgPath}" alt="${f.name}" class="pull-left" long="${f.note}" source="${f.path}">
+	       					<div class="pull-left">
+       							<span class="videoname ellipsis">${f.name}</span>
+	       						<span>${f.size}</span>
+	       						<span><fmt:formatDate value="${f.createDate}" pattern='yyyy-MM-dd'/></span>
+	       					</div>
+	       				</div>
+       			 </c:forEach>      				
+       			</div>
+       			<div class="ovh material-footer">
+       				<nav class="pull-left">
+					  <ul class="pagination pagination-sm">
+					    <li>
+					      <a href="#" aria-label="Previous">
+					        <span aria-hidden="true">&laquo;</span>
+					      </a>
+					    </li>
+					    <li class="active"><a href="#">1</a></li>
+					    <li><a href="#">2</a></li>
+					    <li><a href="#">3</a></li>
+					    <li><a href="#">4</a></li>
+					    <li><a href="#">5</a></li>
+					    <li>
+					      <a href="#" aria-label="Next">
+					        <span aria-hidden="true">&raquo;</span>
+					      </a>
+					    </li>
+					  </ul>
+					</nav>
+					<div class="pull-right">
+						<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">取消</button>
+        				<button type="button" class="btn btn-primary btn-sm confirm">确定</button>
+					</div>
+       			</div>
+       		</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade bs-example-modal-lg material-modal" id="musicModal" tabindex="-1" role="dialog" aria-labelledby="musicModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">音乐素材</h4>
+      </div>
+      <div class="modal-body ovh">
+       		<div class="material-left pull-left">
+       			<div class="database active material-type"><a href="javascript:void(0)">音乐库</a></div>
+       			<div class="mymaterial myback material-type"><a href="javascript:void(0)">我的音乐</a></div>
+       			<div class="upload_material"><a href="javascript:void(0)" id="musicUpload" class="glyphicon glyphicon-cloud-upload">上传</a></div>
+       		</div>	
+       		<div class="material-right pull-right">
+       			<div class="material-header ovh">
+       				<a href="javascript:void(0)">最新</a>
+       				<a href="javascript:void(0)">最热</a>
+       				<select name="" id="" class="form-control">
+       					<option value="">广告商A</option>
+       					<option value="">广告商B</option>
+       					<option value="">广告商C</option>
+       					<option value="">广告商D</option>
+       				</select>
+       				<form class="form-inline pull-right ">
+					  <div class="form-group">
+					    <label class="sr-only" for="exampleInputAmount">搜索</label>
+					    <div class="input-group">					  
+					      <input type="text" class="form-control input-sm" placeholder="Amount">					    
+					    </div>
+					  </div>
+					  <button type="submit" class="btn btn-primary btn-sm">搜索</button>
+					</form>
+       			</div>
+       			<div class="material-mainer">    
+       			    <div class="material-item top-span row">
+							  <span class="col-md-5">文件名</span>
+							  <span class="col-md-2">时长</span>
+							  <span class="col-md-1" aria-labelledby=>大小</span>
+							  <span class="col-md-2">操作</span>
+							  <span class="col-md-2">修改时间</span>	 	
+		       			</div>     				
+					<c:forEach items="${mList}" var="f" varStatus="status">
+	       				<div class="material-item row musicmodal-m-i">
+	<%--        					<span class="col-md-5"><img src="${ctxStatic}/images/program/itunes-alt.png" alt="${f.name}" long="${f.size}" source="${f.path}">${f.name}</span> --%>
+	<span class="col-md-5 ellipsis"><img src="${ctxStatic}/images/program/itunes-alt.png" alt="${f.name}" long="${f.note}" source="${f.path}">${f.name}</span>
+	       					<span class="col-md-2">${f.note}</span>
+	       					<span class="col-md-1">${f.size}</span>
+	       					<span class="col-md-2 pauseMusic">暂停</span>	   
+	       					<span class="col-md-2 playMusic">播放</span>	    					
+	       					<span class="col-md-2"><fmt:formatDate value="${f.createDate}"  pattern="yyyy-MM-dd"/></span>
+	       					
+	       					<div id="amazingaudioplayer-${status.index + 1}" style="display:block;position:absolute;width:300px;height:auto;margin:0px auto 0px;visibility:hidden" class="amazingaudioplayer">
+						        <ul class="amazingaudioplayer-audios" style="display:none;">
+						            <li data-artist="CNBLUE" data-title="Can&apos;t Stop" data-album="Can&apos;t Stop" data-info="" data-image="" data-duration="238">
+						             <div class="amazingaudioplayer-source" data-src="${f.path}" data-type="audio/mpeg" /> 
+						           <%--    <div class="amazingaudioplayer-source" data-src="${f.path}" data-type="audio/mpeg" /> --%>
+						            </li>
+						        </ul>
+						    </div>
+						    
+						<script>			    
+						    jQuery(document).ready(function(){
+
+    var scripts = document.getElementsByTagName("script");
+
+    var jsFolder = "";
+
+    for (var i= 0; i< scripts.length; i++)
+
+    {
+
+        if( scripts[i].src && scripts[i].src.match(/initaudioplayer-1\.js/i))
+
+            jsFolder = scripts[i].src.substr(0, scripts[i].src.lastIndexOf("/") + 1);
+
+    }
+    
+    jQuery("#amazingaudioplayer-"+${status.index + 1}).amazingaudioplayer({
+        jsfolder:jsFolder,
+        skinsfoldername:"",
+        titleinbarwidthmode:"fixed",
+        timeformatlive:"%CURRENT% / LIVE",
+        volumeimagewidth:24,
+        barbackgroundimage:"",
+        tracklistarrowimageheight:16,
+        showtime:true,
+        titleinbarwidth:80,
+        showprogress:true,
+        random:false,
+        titleformat:"%TITLE%",
+        height:600,
+        loadingformat:"Loading...",
+        prevnextimage:"prevnext-24-24-0.png",
+        showinfo:false,
+        imageheight:100,
+        skin:"Bar",
+        loopimage:"loop-24-24-0.png",
+        loopimagewidth:24,
+        showstop:false,
+        prevnextimageheight:24,
+        infoformat:"By %ARTIST% %ALBUM%<br />%INFO%",
+        showloading:false,
+        volumebarheight:80,
+        tracklistarrowimagewidth:48,
+        imagefullwidth:false,
+        skinsfoldername:"",
+        width:300,
+        showimage:false,
+        showtracklist:false,
+        volumeimage:"volume-24-24-0.png",
+        playpauseimagewidth:24,
+        loopimageheight:24,
+        tracklistitemformat:"%ID%. %TITLE% <span style='position:absolute;top:0;right:0;'>%DURATION%</span>",
+        prevnextimagewidth:24,
+        tracklistarrowimage:"tracklistarrow-48-16-0.png",
+        playpauseimageheight:24,
+        showbackgroundimage:false,
+        imagewidth:100,
+        stopimage:"stop-24-24-0.png",
+        showvolume:true,
+        playpauseimage:"playpause-24-24-0.png",
+        showprevnext:true,
+        backgroundimage:"",
+        volumebarpadding:8,
+        progressheight:8,
+        showtracklistbackgroundimage:false,
+        showtitle:false,
+        showtitleinbar:false,
+        heightmode:"auto",
+        titleinbarformat:"%TITLE%",
+        stopimageheight:24,
+        stopimagewidth:24,
+        fullwidth:false,
+        tracklistbackgroundimage:"",
+        showloop:true,
+        showbarbackgroundimage:false,
+        volumeimageheight:24,
+        timeformat:"%CURRENT% / %DURATION%",
+        autoplay:false,
+        showvolumebar:true,
+        loop:0,
+        tracklistitem:10
+    });
+
+
+});
+						    
+						    
+			</script>			    
+						    
+						    
+						    
+	       				</div>
+	       			</c:forEach>
+       			</div>
+       			<div class="ovh material-footer">
+       				<nav class="pull-left">
+					  <ul class="pagination pagination-sm">
+					    <li>
+					      <a href="#" aria-label="Previous">
+					        <span aria-hidden="true">&laquo;</span>
+					      </a>
+					    </li>
+					    <li class="active"><a href="#">1</a></li>
+					    <li><a href="#">2</a></li>
+					    <li><a href="#">3</a></li>
+					    <li><a href="#">4</a></li>
+					    <li><a href="#">5</a></li>
+					    <li>
+					      <a href="#" aria-label="Next">
+					        <span aria-hidden="true">&raquo;</span>
+					      </a>
+					    </li>
+					  </ul>
+					</nav>
+					<div class="pull-right">
+						<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">取消</button>
+        				<button type="button" class="btn btn-primary btn-sm confirm">确定</button>
+					</div>
+       			</div>
+
+       		</div>
+      </div>
+    
+    </div>
+  </div>
+</div>
+<div class="modal fade bs-example-modal-lg material-modal" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="excelModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">excel素材</h4>
+      </div>
+      <div class="modal-body ovh">
+       		<div class="material-left pull-left">
+       			<div class="database active material-type"><a href="javascript:void(0)">excel库</a></div>
+       			<div class="mymaterial myback material-type"><a href="javascript:void(0)">我的excel</a></div>
+       			<div class="upload_material"><a href="javascript:void(0)" id="excelUpload" class="glyphicon glyphicon-cloud-upload">上传</a></div>
+       		</div>	
+       		<div class="material-right pull-right">
+       			<div class="material-header ovh">
+       				<a href="javascript:void(0)">最新</a>
+       				<a href="javascript:void(0)">最热</a>
+       				<select name="" id="" class="form-control">
+       					<option value="">广告商A</option>
+       					<option value="">广告商B</option>
+       					<option value="">广告商C</option>
+       					<option value="">广告商D</option>
+       				</select>
+       				<form class="form-inline pull-right ">
+					  <div class="form-group">
+					    <label class="sr-only" for="exampleInputAmount">搜索</label>
+					    <div class="input-group">					  
+					      <input type="text" class="form-control input-sm" placeholder="Amount">		    
+					    </div>
+					  </div>
+					  <button type="submit" class="btn btn-primary btn-sm">搜索</button>
+					</form>
+       			</div>
+       			<div class="material-mainer">
+		               <div class="top-span row">
+							  <span class="col-md-5">文件名</span>
+							  <span class="col-md-2">页数</span>
+							  <span class="col-md-2" aria-labelledby=>大小</span>
+							  <span class="col-md-3">修改时间</span>	 	
+		       			</div>  
+		       			<c:forEach items="${eList}" var="f" >
+		       				<div class="material-item row excel excelmodal-m-i">
+		       					<span class="col-md-5 ellipsis"><img src="${ctxStatic}/images/program/xxxx.png" alt="${f.name}" note="${f.note}" excelurl="${f.path}" htmlurl="" attrid="${f.id}">${f.name}</span>
+		       					<span class="col-md-2">${f.note}</span>
+		       					<span class="col-md-2">${f.size}</span>
+		       					<span class="col-md-3"><fmt:formatDate value="${f.createDate}"  pattern="yyyy-MM-dd"/></span>
+		       				</div>
+		       			</c:forEach>
+       			</div>
+       			<div class="ovh material-footer">
+       				<nav class="pull-left">
+					  <ul class="pagination pagination-sm">
+					    <li>
+					      <a href="#" aria-label="Previous">
+					        <span aria-hidden="true">&laquo;</span>
+					      </a>
+					    </li>
+					    <li class="active"><a href="#">1</a></li>
+					    <li><a href="#">2</a></li>
+					    <li><a href="#">3</a></li>
+					    <li><a href="#">4</a></li>
+					    <li><a href="#">5</a></li>
+					    <li>
+					      <a href="#" aria-label="Next">
+					        <span aria-hidden="true">&raquo;</span>
+					      </a>
+					    </li>
+					  </ul>
+					</nav>
+					<div class="pull-right">
+						<button type="button" class="btn btn-default btn-sm" data-dismiss="modal">取消</button>
+        				<button type="button" class="btn btn-primary btn-sm confirm">确定</button>
+					</div>
+       			</div>
+       		</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="${ctxStatic}/js/program/undone.js"></script>
+<script src='${ctxStatic}/js/program/jquery.undone.js'></script>
+<script>
+$.undone();
+$("#undo, #redo, #clear").click(function(){
+	console.log(this.id);
+    $.undone(this.id);
+});
+/* $(document).on("mouseenter", ".toggle", function () {
+    var self = $(this);
+    $.undone("register",
+        function () { 
+    		//redo 
+        	self.addClass("hidden"); 
+        },
+        function () { 
+        	//undo 
+        	self.removeClass("hidden");
+        }
+    );
+}); */
+
+
+$(document).keydown(function (e) {
+    var key = e.which;
+    if (e.ctrlKey) { // ctrl
+        if (key === 90) $.undone("undo"); // z
+        if (key === 89) $.undone("redo"); // y
+    }
+});
+
+$(window).on("undone:change", function(e, name, undoLen, redoLen){
+    $("#undo").prop("disabled", !undoLen);
+    $("#redo").prop("disabled", !redoLen);
+    $("input.undoneid").val(undoLen);
+   
+});
+</script>
+<script type="text/javascript" src="${ctxStatic}/js/program/jquery.zxxPageRuler.1.1.js"></script>
+<script src="${ctxStatic}/js/program/script.js" type="text/javascript"></script>
+ <script src="${ctxStatic}/js/program/new_rili.js" type="text/javascript"></script>
+<script src="${ctxStatic}/js/program/tq.code.js" type="text/javascript"></script> 
+ <script src="${ctxStatic}/audioplayerengine/amazingaudioplayer.js"></script>    
+<script src="${ctxStatic}/audioplayerengine/initaudioplayer-1.js"></script>
+<script src="${ctxStatic}/js/program/getTime.js"></script>	
+<script src="${ctxStatic}/js/program/colpick.js"></script>	
+<script type="text/javascript">
+$(function(){
+	/* $("#visRuler").click(function(){ */
+		$.pageRuler();
+		$(".content-center-topfd").addClass("lfettop"); 
+		/* $.pageRulerToggle();*/
+		/*if($("#zxxScaleRulerH").is(":visible")){			
+			$(".content-center-topfd").addClass("lfettop"); 
+		}else{			
+			$(".content-center-topfd").removeClass("lfettop"); 
+		} */
+/* 	}); */
+});
+</script>
+</body>
+</html>

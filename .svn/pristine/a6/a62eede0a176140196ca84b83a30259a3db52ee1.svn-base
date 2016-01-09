@@ -1,0 +1,100 @@
+package apm.modules.program.service;
+
+import java.util.Date;
+import java.util.List;
+
+import apm.common.core.Page;
+import apm.common.service.BaseService;
+import apm.common.utils.StringUtils;
+
+import apm.modules.program.entity.Program;
+import apm.modules.program.dao.ProgramDao;
+
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TermQuery;
+
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * 节目实体类Service
+ * @author gfp
+ * @version 2015-08-17
+ */
+@Service
+@Transactional(readOnly = true)
+public class ProgramService extends BaseService<ProgramDao, Program> {
+
+	//注入其他的Dao层或本层
+	@Autowired
+	private ProgramDao programDao;
+	
+	//查找所有节目实体类(未删除)的记录
+	public List<Program> findAll() {
+		return dao.findAll();
+	}
+	
+	//节目实体类列表多条件查询，分页
+	public Page<Program> find(Page<Program> page, Program program) {
+		DetachedCriteria dc = dao.createDetachedCriteria();
+		if (StringUtils.isNotEmpty(program.getRemarks())){
+			dc.add(Restrictions.like("remarks", "%"+program.getRemarks()+"%"));
+		}
+		dc.add(Restrictions.eq(Program.DEL_FLAG, Program.DEL_FLAG_NORMAL));
+		dc.addOrder(Order.desc("id"));
+		return programDao.find(page, dc);
+	}
+	
+	//保存节目实体类信息
+	@Transactional(readOnly = false)
+	public void save(Program program) {
+		dao.clear();
+		dao.save(program);
+	}
+	
+	//删除节目实体类信息：逻辑删除 、通过ID号删除
+	@Transactional(readOnly = false)
+	public void delete(String id) {
+		dao.deleteById(id);
+	}
+	
+	/**
+	 * 更新索引
+	 */
+	public void createIndex(){
+		dao.createIndex();
+	}
+	
+	/**
+	 * 全文检索  
+	 */
+	public Page<Program> search(Page<Program> page, String q){
+		
+		// 设置查询条件
+		BooleanQuery query = dao.getFullTextQuery(q, "name");
+		//System.out.println(query);
+		// 设置过滤条件
+		BooleanQuery queryFilter = dao.getFullTextQuery(new BooleanClause(
+				new TermQuery(new Term(Program.DEL_FLAG, String.valueOf(Program.DEL_FLAG_NORMAL))), Occur.MUST));
+		//System.out.println(queryFilter);
+		// 设置排序
+		Sort sort = new Sort();
+		// 全文检索
+		dao.search(page, query, queryFilter, sort);
+		// 关键字高亮
+		dao.keywordsHighlight(query, page.getList(), "name");
+		
+		return page;
+	}
+	
+}

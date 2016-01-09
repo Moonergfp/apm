@@ -1,0 +1,164 @@
+package apm.modules.program.web;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import apm.common.config.Global;
+import apm.common.core.Page;
+import apm.common.utils.OfficeUtils;
+import apm.common.web.BaseController;
+import apm.modules.fileManage.entity.FileInfosa;
+import apm.modules.fileManage.service.FileInfosaService;
+import apm.modules.program.entity.Program;
+import apm.modules.program.service.ProgramService;
+
+/**
+ * 节目实体类Controller
+ * @author gfp
+ * @version 2015-08-17
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/program")
+public class ProgramController extends BaseController<ProgramService, Program> {
+
+	//注入其他的Service层或本层
+	@Autowired
+	private ProgramService programService;
+	@Autowired
+	private FileInfosaService fileInfosaService;
+	//节目制作初始化页面
+	@RequestMapping(value="make")
+	public String make(HttpServletRequest req){
+		return "modules/program/programMake";
+	}
+	
+	//返回到节目实体类列表页，完成分页显示
+	@RequestMapping(value = {"list", ""})
+	public String list(Program program, HttpServletRequest request, HttpServletResponse response, Model model) {
+		List<Program> list = service.findAll();
+		model.addAttribute("list", list);
+		
+        Page<Program> page = service.find(new Page<Program>(request, response), program); 
+        model.addAttribute("page", page);
+		return "modules/program/programList";
+	}
+	
+	//返回到节目实体类表单页
+	@RequestMapping(value = "form")
+	public String form(String ratio, String direction, Model model) {
+		String width = direction.equals("0")?ratio.split("[*]")[0]: ratio.split("[*]")[1];
+		String height = direction.equals("0")?ratio.split("[*]")[1]: ratio.split("[*]")[0];
+		 model.addAttribute("width", width); //宽
+		 model.addAttribute("height", height); //高
+		 // Map map = new HashMap<String, Object>();
+		 List<FileInfosa> fV = fileInfosaService.getFirstVedio(0, 6, "program_video_path");
+		 //获取每个视频的缩略图
+		 if(fV != null && fV.size() > 0){
+			 for(FileInfosa f : fV){
+				 //通过treeId获取缩略图文件
+				 List<FileInfosa> fImg = fileInfosaService.findByTreeId(f.getId());
+				 if(fImg != null && fImg.size() > 0){
+					 f.setImgPath(fImg.get(0).getPath());
+				 }
+			 }
+		 }
+		 //map.put("vList", fV);
+		//获取第一页视频文件,目前默认每一页为6个
+		 model.addAttribute("vList", fV);
+		 //获取背景图片
+		 model.addAttribute("bList", fileInfosaService.getFirstVedio(0, 10, "back_img_path"));
+		 //获取图片
+		 model.addAttribute("iList", fileInfosaService.getFirstVedio(0, 10, "img_path"));
+		 //获取ppt文件
+		 List<FileInfosa> pList = fileInfosaService.getFirstVedio(0, 10, "ppt_path");
+		 //获取每个ppt的所有图片
+		 if(pList != null && pList.size() > 0){
+			 for(FileInfosa f: pList){
+				 if(f != null){
+					 List<String> imgPath = fileInfosaService.findByTreeIdPpt(f.getId());
+					 f.setPptImgPath(imgPath);
+				 }
+			 }
+		 }
+		 model.addAttribute("pList", pList);
+		 //获取word文档,设置html路径
+		 List<FileInfosa> fW = fileInfosaService.getFirstVedio(0, 10, "word_path");
+		 if(fW != null && fW.size() > 0){
+			 for(FileInfosa f: fW){
+				 List<FileInfosa> fH = fileInfosaService.findByTreeId(f.getId());
+				 if(fH != null && fH.size() > 0){
+					 f.setHtmlPath(fH.get(0).getPath());
+				 }
+			 }
+		 }
+		 model.addAttribute("wList", fW);
+		//获取Excel文档,获取html路径
+		 List<FileInfosa> fE = fileInfosaService.getFirstVedio(0, 10, "excel_path");
+		 if(fE != null && fE.size() > 0){
+			 for(FileInfosa f: fE){
+				 List<FileInfosa> fH = fileInfosaService.findByTreeId(f.getId());
+				 if(fH != null && fH.size() > 0){
+					 f.setHtmlPath(fH.get(0).getPath());
+				 }
+			 }
+		 }
+		 model.addAttribute("eList", fE);
+		 //获得音乐文件
+		 model.addAttribute("mList", fileInfosaService.getFirstVedio(0, 10, "music_path"));
+		return "modules/program/programForm";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="word")
+	public String word(HttpServletRequest req) throws TransformerException, IOException, ParserConfigurationException{
+		//OfficeUtils.doc2Html("D://样品模块需求.doc", "D://样品模块需求.html");
+		OfficeUtils.doGenerateHTMLFile("D://LMS技术大全.docx", "D://LMS技术大全.html");
+		return "success";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="excel")
+	public String excel(HttpServletRequest req) throws IOException, ParserConfigurationException, TransformerException{
+		 OfficeUtils.excel2Html("D://培训内容.xls", "D://培训内容.html");
+		return "success";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="ppt")
+	public String ppt(HttpServletRequest req) throws Exception{
+		//OfficeUtils.convert("ppt4495.pptx", 11);
+		return "success";
+	}
+	
+	//保存节目实体类信息，并返回到列表页
+
+	@RequestMapping(value = "save")
+	public String save(HttpServletRequest req, HttpServletResponse response, Model model) {
+		response.setHeader("X-XSS-Protection", "0");
+		 model.addAttribute("saveDom", req.getParameter("saveDom"));
+		return "modules/program/saveTest";
+	}
+	
+	@RequestMapping(value="preview")
+	public String preview(HttpServletRequest req, HttpServletResponse response, Model model){
+		//在谷歌下无法放入javascript, 有xss保护功能导致, 加入一下代码即可
+		response.setHeader("X-XSS-Protection", "0");
+		String dom = req.getParameter("dom");
+		model.addAttribute("dom", dom);
+		return "modules/program/programPreview";
+	}
+}

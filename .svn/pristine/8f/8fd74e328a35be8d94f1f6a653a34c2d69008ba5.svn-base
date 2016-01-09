@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<!--make by zhaoxiaoming-->
+<meta charset="utf-8">
+<title>自动补全下拉插件</title>
+<link type="text/css" rel="stylesheet" href="css/style.css"/>
+<!--
+	将此代码复制到相应的模块页面
+	<link type="text/css" rel="stylesheet" href="${ctxStatic}/frontEnd/autoComple/css/style.css"/>
+	<script src="${ctxStatic}/frontEnd/autoComple/jquery.combox.js" type="text/javascript"></script>  
+-->
+
+</head>
+<body>
+  <!--设置一个放置该下拉框的区域-->
+  <div id="demo" style="width:150px;"></div>
+  <div id="newCodeDiv" style="width:150px;"></div>
+  <div id="demo3" style="width:150px;"></div>
+  <div id="newCodeDivBig" style="width:150px;"></div>
+  <!--引入jquery-->
+  <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+  <script type="text/javascript" src="jquery.combox.js"></script>
+  <script type="text/javascript">
+   $(function(){
+		$("#demo").combox({
+	      datas:["1111","2222","2222","44444","55555"],
+	      issingle:true/*是否需要下拉三角符号默认显示*/,
+	      initId:"demoinput"/*初始化下拉input的id默认无*/,
+	      initContent:"2222"/*初始化显示的值默认无*/});
+		
+		/**
+			在LMS系统上使用 
+		*/
+		 $("#newCodeDiv").combox({
+			 fieldName:"newCode",//请求的字段
+			 entityName:"Materials",//字段对应的实体
+	         ctx:"${ctx}",//请求服务器的项目路径
+	         ctxStatic:"${ctxStatic}",//静态文件存放的地址
+	         issingle:true/*是否需要下拉三角符号默认显示*/,
+	         initId:"demoinput"/*初始化下拉input的id默认无*/,
+	         initName:"demoinput"/*初始化下拉input的name默认无*/
+	     });
+
+	     $("#demo3").combox({
+	      datas:["44444","klsafksa","554564"],
+	      issingle:true/*是否需要下拉三角符号默认显示*/,
+	      initId:"demoinput3"/*初始化下拉input的id默认无*/,
+	      initContent:"2222"/*初始化显示的值默认无*/});
+	 });
+   
+   $("#newCodeDivBig").combox({
+		 fieldName:"newCode",//请求的字段
+		 entityName:"Materials",//字段对应的实体
+       ctx:"${ctx}",//请求服务器的项目路径
+       ctxStatic:"${ctxStatic}",//静态文件存放的地址
+       issingle:true/*是否需要下拉三角符号默认显示*/,
+       doBigDatas:true,
+       initId:"demoinput"/*初始化下拉input的id默认无*/,
+       initName:"demoinput"/*初始化下拉input的name默认无*/,
+   });	
+   
+  </script>
+</body>
+</html>

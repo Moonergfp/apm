@@ -1,0 +1,174 @@
+package apm.modules.fileManage.entity;
+
+
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import apm.common.core.BaseEntity;
+
+/**
+ * 文件实体类
+ * @author wq
+ *
+ */
+@Entity
+@Table(name = "tbl_file_infos")
+@DynamicInsert @DynamicUpdate
+public class FileInfosa extends BaseEntity{
+		@Override
+	public String toString() {
+		return "FileInfosa [type=" + type + ", name=" + name + ", path=" + path
+				+ ", treeId=" + treeId + ", id=" + id + "]";
+	}
+		private static final long serialVersionUID = 1L;
+		private String type;		//文件类型
+		private String name;		//文件名
+		private String path;		//绝对路径
+		private String treeId;      //上级目录id
+		private String note;     	//说明
+		private String version; 	//版本
+		private Date date;		    //上传日期
+		private String level; 		//密级 
+	    private String size;        //文件大小
+	    private String uploader;    //上传者
+	    private FileSwf swfId;	    //文档swf文件
+	    private String swfFlag;		//swf文件标志，NULL是每次重新生成swf,1是保存swf,即当已存在该文件的SWF文件，将不再生成
+		private String auditStaffId;//审核人ID
+	    private Date auditDate;      //审核时间
+	    private String auditFlag;   //审核标志
+	    private String tenandId;    //区分不同的公司标志
+	    
+	    @Transient
+	    private String imgPath; //缩略图路径
+	    @Transient
+	    private String htmlPath; //html路径
+		@Transient
+	    private List<String> pptImgPath; //ppt图片路径
+		@Transient
+	    public String getHtmlPath() {
+			return htmlPath;
+		}
+		public void setHtmlPath(String htmlPath) {
+			this.htmlPath = htmlPath;
+		}
+	    @Transient
+	    public List<String> getPptImgPath() {
+			return pptImgPath;
+		}
+		public void setPptImgPath(List<String> pptImgPath) {
+			this.pptImgPath = pptImgPath;
+		}
+		@Transient
+	    public String getImgPath() {
+			return imgPath;
+		}
+		public void setImgPath(String imgPath) {
+			this.imgPath = imgPath;
+		}
+		public String getTreeId() {
+			return treeId;
+		}
+		public void setTreeId(String treeId) {
+			this.treeId = treeId;
+		}
+		public String getTenandId() {
+			return tenandId;
+		}
+		public void setTenandId(String tenandId) {
+			this.tenandId = tenandId;
+		}
+		public String getType() {
+			return type;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getPath() {
+			return path;
+		}
+		public void setPath(String path) {
+			this.path = path;
+		}
+		public String getNote() {
+			return note;
+		}
+		public void setNote(String note) {
+			this.note = note;
+		}
+		public String getVersion() {
+			return version;
+		}
+		public void setVersion(String version) {
+			this.version = version;
+		}
+		public Date getDate() {
+			return date;
+		}
+		public void setDate(Date date) {
+			this.date = date;
+		}
+		public String getLevel() {
+			return level;
+		}
+		public void setLevel(String level) {
+			this.level = level;
+		}
+		public String getSize() {
+			return size;
+		}
+		public void setSize(String size) {
+			this.size = size;
+		}
+		public String getUploader() {
+			return uploader;
+		}
+		public void setUploader(String uploader) {
+			this.uploader = uploader;
+		}
+		public FileSwf getSwfId() {
+			return swfId;
+		}
+		public void setSwfId(FileSwf swfId) {
+			this.swfId = swfId;
+		}
+		public String getSwfFlag() {
+			return swfFlag;
+		}
+		public void setSwfFlag(String swfFlag) {
+			this.swfFlag = swfFlag;
+		}
+		public String getAuditStaffId() {
+			return auditStaffId;
+		}
+		public void setAuditStaffId(String auditStaffId) {
+			this.auditStaffId = auditStaffId;
+		}
+		public Date getAuditDate() {
+			return auditDate;
+		}
+		public void setAuditDate(Date auditDate) {
+			this.auditDate = auditDate;
+		}
+		public String getAuditFlag() {
+			return auditFlag;
+		}
+		public void setAuditFlag(String auditFlag) {
+			this.auditFlag = auditFlag;
+		}
+		public static long getSerialversionuid() {
+			return serialVersionUID;
+		}
+	}
